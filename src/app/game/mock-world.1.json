@@ -1,0 +1,105 @@
+{  
+  "start":{  
+    "node":"n1000",
+    "on_start":"I woke up in a room."
+  },
+  "nodes":{  
+    "n1000":{  
+      "title":"a room",
+      "on_enter_first_time": "I find myself in a room, entirely empty but for a single wooden door at one side.\nLorem ipsum dolor sit amed.\nsssssoooowwwwwwlllllkknnbb 'ggggg'",
+      "on_enter": [
+        "I'm back in that empty room."
+      ],
+      "on_look":[
+        "It's still just a stupid room",
+        "Same as before.\nWhy do I keep coming here?",
+        "Whoa! A room!"
+      ],
+      "actions":[
+        {  
+          "handle":"Go to sleep",
+          "on_do":["I went to sleep and splept.","And then I slept.","And then...","I woke up in a room."]
+        }
+      ],
+      "exits":[  
+        {  
+          "node":"n2000",
+          "handle":"Open the door",
+          "on_go":"I opened the door and stepped confusedly outside."
+        }
+      ]
+    },
+    "n2000":{  
+      "title":"Tehtropgia streets",
+      "on_enter_first_time":"Streets of Tehtropgia are full of nothing.\nThere are two houses on both sides of the road I'm standing on.",
+      "on_enter": [
+        "Back to the streets."
+      ],
+      "actions":[
+        {  
+          "handle":"Look at my shoes",
+          "on_do":["I look at my shoes. I have two.\nWhat a life."]
+        }
+      ],
+      "exits":[  
+        {  
+          "node":"n1000",
+          "handle":"Enter the blue house",
+          "on_go":"I opened the door and stepped inside the blue building."
+        },
+        {  
+          "node":"n3000",
+          "handle":"Enter the orange house",
+          "on_go":"I opened the door and stepped inside the orange building."
+        }
+      ]
+    },
+    "n3000":{  
+      "title":"the Carrots shop",
+      "on_enter_first_time":"Nuffin but carrots and oranges here.\nThe smell of fresh juice is not at all unpleasant though...",
+      "on_enter": [
+        "Am I getting hungry?"
+      ],
+      "actions":[
+        {  
+          "handle":"Inspect le carrots",
+          "on_do":[
+            "Look at dem fine carrots.",
+            "Fresh, fresh carrots.",
+            "\"Fuck you, fresh carrots.\"",
+            "\"Hey! No cussing mah carrots!\"",
+            "The shop keeper seems angry.",
+            "You win this round, carrots.",
+            "I'm watching you..."]
+        },
+        {  
+          "handle":"Inspect le oranges",
+          "on_do":["- Such many orange -","- Much fruit -","- Wow -","- Amaze -"]
+        },
+        {  
+          "handle":"Inspect le cockroach on ze floor",
+          "on_do":["I take a closer look at a half-squished cockroach on the floor.","It's pretty dead.","Aaaargh!","It's almost dead..."]
+        }
+      ],
+      "exits":[  
+        {  
+          "node":"n2000",
+          "handle":"Exit the shop",
+          "on_go":"I opened the shop's door and stepped back into the streets."
+        }
+      ]
+    }
+  },
+  "convos-random":{
+    "j1":[ 
+        "- Why do you seem to be writing in that notebook of yours, like, every second of your life?",
+        "- Alwight, alright, I'm putting it down.",
+        "- I can literallily see you still writing this very conversation right now.",
+        "- I'm not, I swear. Anyway, {question}",
+        "- ...\nWhatever. {response}"
+    ]
+  },
+  "global":{  
+    "time":0.0
+  }
+}

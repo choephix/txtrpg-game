@@ -1,14 +1,77 @@
 <!doctype html>
 <html lang="en">
+  
 <head>
-  <meta charset="utf-8">
-  <title>Project</title>
+  <title>⚡</title>
   <base href="/">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#e2d9ce">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  <script>this.history.scrollRestoration = "manual";</script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1976d2">
 </head>
+
 <body>
-  <app-root></app-root>
+  <app-root>
+    
+    <!--LOADING ANIMATION-->
+    <style>
+    .loading {
+      animation: expand 300ms infinite 200.0001ms linear normal;
+      background-color: black;
+      border-radius: 50%;
+      font-size: 0;
+      height: 0.18vh;
+      overflow: visible;
+      position: relative;
+      width: 0.18vh;
+    }
+    .loading:after, .loading:before {
+      animation: expand 300ms infinite linear normal;
+      background-color: black;
+      border-radius: 50%;
+      content: "";
+      height: 0.18vh;
+      position: absolute;
+      width: 0.18vh;
+    }
+    .loading:before {
+      animation-delay: 99.9999ms;
+      right: 2vh;
+    }
+    .loading:after {
+      animation-delay: 300ms;
+      left: 2vh;
+    }
+    @keyframes expand {
+      0% { box-shadow: 0 0 0 0 black; }
+      25% { box-shadow: 0 0vh 0 0.12vh black; }
+      100% { box-shadow: 0 0 0 0 black; }
+    }
+    .splash {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      background-color: #fff;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      opacity:.30;
+    }
+    </style>
+    <div class="splash" aria-busy="true">
+      <span role="progressbar" class="loading">Loading...</span>
+    </div>
+  </app-root>
+  
+  <!--MESSAGE ON NO JAVASCRIPT-->
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
+  
 </body>
+
 </html>

@@ -1,0 +1,296 @@
+{
+  "start": {
+    "node": "spawnlake",
+    "on_start": "I woke up. There is a veery veery loong, huge, giant, humongous, incomprehensibly ginormous list of things I did.\nBut that's not important now.\n\n\n-\n\n"
+  },
+  "aliases": {
+    "<VILLAGE>": "the village",
+    "<INN>": "Börris' Inn & Tavern",
+    "<CLINIC>": "the clinic",
+    "<BLACKSMITHS>": "Kraig and Sons' Blades & Armor",
+    "<PLAZA>": "the village's small plaza",
+    "<DUNGEON1>": "the creepy cave",
+    "<DUNGEON2>": "the bandit camp"
+  },
+  "nodes": {
+    "spawnlake": {
+      "title": "inside the Lake of Birth",
+      "exits": [
+        {
+          "node": "spawnlake_shore",
+          "handle": "Go to the shore",
+          "on_go": "I started swimming toward the shore."
+        }
+      ]
+    },
+    "spawnlake_shore": {
+      "title": "the Lake of Birth",
+      "exits": [
+        {
+          "node": "forest_path",
+          "handle": "Enter the thick forest path",
+          "on_go": "I entered the thick forest and followed the path."
+        }
+      ]
+    },
+    "forest_path": {
+      "title": "the thick forest of doom",
+      "exits": [
+        {
+          "node": "spawnlake_shore",
+          "handle": "Go to the lake",
+          "on_go": "I followed the path into the depths of the forest, until reached the Lake of Birth."
+        },
+        {
+          "node": "north_exit",
+          "handle": "Leave the forest",
+          "on_go": "I exited the forest and followed the road."
+        }
+      ]
+    },
+    "north_exit": {
+      "title": "the north end of the village",
+      "exits": [
+        {
+          "node": "forest_path",
+          "handle": "Enter the forest",
+          "on_go": "I entered the forest of doom"
+        },
+        {
+          "node": "north_residential",
+          "handle": "Enter the village",
+          "on_go": "I entered the village of Rok"
+        }
+      ]
+    },
+    "north_residential": {
+      "title": "village houses (north)",
+      "exits": [
+        {
+          "node": "north_exit",
+          "handle": "Go north",
+          "on_go": "I went to the north exit out of the village"
+        },
+        {
+          "node": "inn_street",
+          "handle": "Go south",
+          "on_go": "I went deeper towards the village center"
+        }
+      ]
+    },
+    "inn_street": {
+      "title": "the front of <INN>",
+      "exits": [
+        {
+          "node": "north_residential",
+          "handle": "Go north",
+          "on_go": "I went north, toward the residential area"
+        },
+        {
+          "node": "inn",
+          "handle": "Enter <INN>",
+          "on_go": "I entered <INN>"
+        },
+        {
+          "node": "plaza",
+          "handle": "Go down the hill, toward the <PLAZA>",
+          "on_go": "I moved down the hill, toward <PLAZA>"
+        }
+      ]
+    },
+    "inn": {
+      "title": "<INN>",
+      "exits": [
+        {
+          "node": "inn_street",
+          "handle": "Go back outside",
+          "on_go": "I opened the door and [exitted|stepped outside][| [the inn|the building|<INN>]]."
+        }
+      ]
+    },
+    "plaza": {
+      "title": "Central Plaza",
+      "exits": [
+        {
+          "node": "inn_street",
+          "handle": "Go up the hill, toward <INN>",
+          "on_go": "I moved up the road, toward the old Inn."
+        },
+        {
+          "node": "clinic",
+          "handle": "Enter the clinic ",
+          "on_go": "I entered the clinic"
+        },
+        {
+          "node": "blacksmith_street",
+          "handle": "Go toward <BLACKSMITHS>",
+          "on_go": "I went toward the metalsmiths' place"
+        },
+        {
+          "node": "market_west",
+          "handle": "Go down to the marketplace",
+          "on_go": "I entered to the marketplace"
+        }
+      ]
+    },
+    "clinic": {
+      "title": "the clinic",
+      "exits": [
+        {
+          "node": "market_east",
+          "handle": "Step outside, to the marketplace",
+          "on_go": "I exited the clinic, and (returned) to the marketplace"
+        },
+        {
+          "node": "plaza",
+          "handle": "Go through the back door",
+          "on_go": "I opened the clinic's back door and stepped out into <PLAZA>."
+        }
+      ]
+    },
+    "blacksmith_street": {
+      "title": "<BLACKSMITHS>",
+      "exits": [
+        {
+          "node": "plaza",
+          "handle": "Go to <PLAZA>",
+          "on_go": "I went to <PLAZA>"
+        },
+        {
+          "node": "market_west",
+          "handle": "Go to the marketplace",
+          "on_go": "I went to the village's marketplace"
+        }
+      ]
+    },
+    "market_west": {
+      "title": "the marketplace (west)",
+      "exits": [
+        {
+          "node": "plaza",
+          "handle": "Go north, to the plaza",
+          "on_go": "I went north, to <PLAZA>."
+        },
+        {
+          "node": "blacksmith_street",
+          "handle": "Go to the blacksmiths",
+          "on_go": "I went west, toward <BLACKSMITHS>"
+        },
+        {
+          "node": "market_east",
+          "handle": "Go east, to the rest of the market",
+          "on_go": "I went to the other part of the market"
+        }
+      ]
+    },
+    "market_east": {
+      "title": "the marketplace (east)",
+      "exits": [
+        {
+          "node": "market_west",
+          "handle": "Go west to see the rest of the market",
+          "on_go": "I went to the other part of the market"
+        },
+        {
+          "node": "clinic",
+          "handle": "Enter <CLINIC>",
+          "on_go": "I opened the clinic's door and went inside."
+        },
+        {
+          "node": "bookstore_street",
+          "handle": "Go south",
+          "on_go": "I exited the market, and went to the south part of the village."
+        }
+      ]
+    },
+    "bookstore_street": {
+      "title": "Book Store",
+      "exits": [
+        {
+          "node": "market_east",
+          "handle": "Enter the village's marketplace",
+          "on_go": "I entered the village's marketplace"
+        },
+        {
+          "node": "residential_south",
+          "handle": "Go toward the Magician's house",
+          "on_go": "I went south, toward the magician's house"
+        }
+      ]
+    },
+    "residential_south": {
+      "title": "The Magician's house",
+      "exits": [
+        {
+          "node": "bookstore_street",
+          "handle": "Go north, toward the center of the village",
+          "on_go": "I went north, toward the center of the village."
+        },
+        {
+          "node": "exit_south",
+          "handle": "Go south, to the end of the village",
+          "on_go": "I went south, until I reached the end of the village"
+        }
+      ]
+    },
+    "exit_south": {
+      "title": "South Exit",
+      "exits": [
+        {
+          "node": "residential_south",
+          "handle": "Enter the village",
+          "on_go": "I went north, entering the small village."
+        },
+        {
+          "node": "dungeon_one",
+          "handle": "Go south, toward <DUNGEON1>",
+          "on_go": "I went south, toward <DUNGEON1>"
+        }
+      ]
+    },
+    "intersection ": {
+      "title": "the intersection",
+      "exits": [
+        {
+          "node": "dungeon_one",
+          "handle": "Continue to <DUNGEON1>",
+          "on_go": "I went to the <DUNGEON1>"
+        },
+        {
+          "node": "dungeon_two",
+          "handle": "Continue to <DUNGEON2>",
+          "on_go": "I went to the <DUNGEON2>"
+        },
+        {
+          "node": "exit_south",
+          "handle": "Continue to <VILLAGE>",
+          "on_go": "I went north, until I reached the village's welcome sign."
+        }
+      ]
+    },
+    "dungeon_one": {
+      "title": "<DUNGEON1>",
+      "exits": [
+        {
+          "node": "intersection ",
+          "handle": "Return to the intersection",
+          "on_go": "I went back north, until I reached the intersection ."
+        }
+      ]
+    },
+    "dungeon_two": {
+      "title": "<DUNGEON2>",
+      "exits": [
+        {
+          "node": "intersection ",
+          "handle": "Return to the intersection",
+          "on_go": "I went back north, until I reached the intersection ."
+        }
+      ]
+    }
+  },
+  "convos-random": {},
+  "global": {
+    "time": 1539388800000
+  }
+}

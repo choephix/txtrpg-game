@@ -1,0 +1,55 @@
+ @import url('https://fonts.googleapis.com/css?family=Caveat|Dancing+Script|Gaegu|Gloria+Hallelujah|Handlee|Hi+Melody|Homemade+Apple|Indie+Flower|Jim+Nightshade|Julee|Just+Another+Hand|Just+Me+Again+Down+Here|Kalam|Kristi|La+Belle+Aurore|Nothing+You+Could+Do|Reenie+Beanie|Satisfy|Swanky+and+Moo+Moo|Tangerine|Allura|Bilbo|Meddon|Monsieur+La+Doulaise|Seaweed+Script|Ruthie|Chelsea+Market|Knewave|Mr+Bedfort|Montez|Over the Rainbow|Pompiere|Princess Sofia|Qwigley|Rock Salt|Coming Soon|Alex Brush|Parisienne|Rouge Script|Stalemate');
+
+.fonted, .fonted pre {
+  /* Not that cursive */
+  font-family: 'Julee', cursive; /* Jin */
+  font-family: 'Jim Nightshade', cursive; /* Abs Calli, upper-mid range official, bit english-gothic */
+
+  font-family: 'Chelsea Market', cursive; /* SIGN */
+  font-family: 'Knewave', cursive; /* Paintbrush */
+  font-family: 'Qwigley', cursive; /* Squigly, nice, lower-mid range fancy, very repetitive*/
+
+  font-family: 'Rock Salt', cursive; /* Hand-sign */
+  font-family: 'Coming Soon', cursive; /* Crude, prob' signpost */
+
+  /*Veery cursive */
+  font-family: 'Allura', cursive; /* Calli-hand, Official */
+  font-family: 'Ruthie', cursive; /* Calli calli, fancy sign-post only */
+  font-family: 'Mr Bedfort', cursive; /* BS calli/fhand */
+  font-family: 'Monsieur La Doulaise', cursive; /* Mrs Mcgonagall from itally */
+  font-family: 'Stalemate', cursive; /* McGonagall 1.01 */
+
+  font-family: 'Satisfy', cursive; /* Your mom's official writing, hand' */
+  font-family: 'Montez', cursive; /* Hand Calli Curvi Nice */
+
+  /* Commonfolk Cursive / The general contenders */
+  font-family: 'Just Me Again Down Here', cursive; /* Bs */
+  font-family: 'Homemade Apple', cursive; /* EXTREME-hand', barely readable (4 a foreigner) */
+  font-family: 'Meddon', cursive; /* Very hand', abs repetitive */
+  font-family: 'Kalam', cursive; /* Type */
+  font-family: 'Just Another Hand', cursive; /* A robot's hand. Condensed. */
+  font-family: 'Nothing you could do', cursive; /* Very handy and feminine */
+  font-family: 'Pompiere', cursive; /* Absolute proper sign-post */
+  font-family: 'Princess Sofia', cursive; /* 'bout what it sounds like */
+  font-family: 'Alex Brush', cursive; /* Pretty, sub-sub-mcgonagall */
+  font-family: 'Parisienne', cursive; /* More calli than hand */
+  font-family: 'Rouge Script', cursive; /* Pretty entirely calli, official */
+  font-family: 'Indie Flower', cursive; /* Nice, but very playful */
+  font-family: 'Gloria Hallelujah', cursive; /* A bit childish */
+  font-family: 'Hi Melody', cursive; /* Square + playful */
+  font-family: 'Reenie Beanie', cursive; /* Hand' and readable, CRAZY angles */
+  font-family: 'Seaweed Script', cursive; /* Nice, readable, bold, very hand' | Use font-weight:lighter ! */
+  font-family: 'Over the Rainbow', cursive; /* Quite crude handi (samy) */
+  font-family: 'Bilbo', cursive; /* Your dad, official */
+  font-family: 'Swanky and moo moo', cursive; /* Right, but somewhat wide */
+  font-family: 'Gaegu', cursive; /* Sweetspot? (a bit squarish) */
+  font-family: 'Handlee', cursive; /* Curvy, but Very type */
+
+  font-family: 'Tangerine', cursive; /* EXTREMELY official, but very readable (more calli' than hand') */
+  font-family: 'La Belle Aurore', cursive; /* Some flare, but obvious hand */
+
+/*     font-size: 25px; */
+/*     margin: 2px; */
+  white-space: pre-wrap;
+  overflow: visible;
+}
