@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
     <router-outlet></router-outlet>
     <nav id="navi">
   	  <div id="navi-branches">
-  	  	<a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}} 🌍</a>
+        <a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}} 🌍</a>
   	  </div>
     </nav>
   </div>
@@ -25,6 +25,7 @@ export class AppComponent {
 	public branch:string = "develop"
   constructor( public router:Router )
   { 
-    router.events.subscribe( e => this.branch = router.url.match(/^\/?([^\/]*)\//)[1] ) 
+    console.log(router)
+    router.events.subscribe( e => this.branch = router.url.match(/^\/?([^\/]*)/)[1] ) 
   }
 }
