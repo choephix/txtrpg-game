@@ -4,10 +4,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   styles: [`
+  #navi, a, div, p { transition: opacity .150s, color .150s; }
   #navi { position:fixed; top:0; right:16px; font-family: 'consolas'; font-size: 1.5vh; text-align:right; }
-  #navi-branches { font-size:1.0vh }
-  #navi a { opacity:.05; display:block; }
-  #navi a:hover { opacity:2.00; }
+  #navi { opacity:.60;  }
+  #navi:hover { opacity:1.0;  }
+  #navi a { opacity:0; font-size:1.0vh; display:none; }
+  #navi:hover a { display:block; opacity:.65 }
+  #navi:hover a:hover { opacity:1 }
   `],
   template: `
   <div>
