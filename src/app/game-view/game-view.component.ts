@@ -33,17 +33,8 @@ export class GameViewComponent implements OnInit {
       const o = this._separator.nativeElement;
       const d = o.y - innerHeight * .5;
       scrollBy( { top: d, behavior: "auto" } )
-      // scrollBy( 0, d )
     } catch( e ) { }
   }
 
   getHalfWindowHeight() { return window.innerHeight * .5 + "px" }
-
-  // scrollToSeparatorSmooth() {
-  //   try {
-  //     const o = this._separator.nativeElement;
-  //     const d = o.y - innerHeight * .5 + o.height * .5;
-  //     scrollBy( { top: d, behavior: "smooth" } )
-  //   } catch( e ) { }
-  // }
 }
