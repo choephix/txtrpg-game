@@ -12,7 +12,8 @@ import { Router } from '@angular/router';
   template: `
   <div>
     <router-outlet></router-outlet>
-    <nav id="navi">
+    <nav id="navi" *ngIf="debug">
+	    <code><b>{{branch.toUpperCase()}}</b></code>
   	  <div id="navi-branches">
         <a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}} 🌍</a>
   	  </div>
@@ -23,9 +24,13 @@ import { Router } from '@angular/router';
 export class AppComponent {
 	public ALL_BRANCHES:string[] = ["master","develop","poc","lorem"]
 	public branch:string = "develop"
+	public debug:boolean = false
   constructor( public router:Router )
   { 
     console.log(router)
-    router.events.subscribe( e => this.branch = router.url.match(/^\/?([^\/]*)/)[1] ) 
+    router.events.subscribe( e => {
+      this.branch = router.url.match(/^\/?([^\/]*)/)[1]
+      this.debug = router.url.includes("/debug")
+    } ) 
   }
 }

@@ -10,7 +10,8 @@ import { Page404Component } from './app-404.component'
 import { GameViewComponent } from './game-view/game-view.component'
 
 const appRoutes: Routes = [
-  { path: ':branch', component: GameViewComponent },
+  { path: ':branch/debug', component: GameViewComponent, data:{debug:true} },
+  { path: ':branch', component: GameViewComponent, data:{debug:false} },
   { path: '', redirectTo: 'poc', pathMatch: 'full' },
   { path: '**', component: Page404Component },
 ];
