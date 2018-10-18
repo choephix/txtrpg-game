@@ -4,10 +4,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   styles: [`
-  #navi { position:fixed; top:0; right:16px; font-family: 'consolas'; font-size: 1.5vh; text-align:right; }
-  #navi-branches { font-size:1.0vh }
-  #navi a { opacity:.05; display:block; }
-  #navi a:hover { opacity:2.00; }
+  #navi, a, div, p { transition: opacity .150s, color .150s; }
+  #navi { position:fixed; top:0.5vh; right:1vh; font-family: 'consolas'; font-size: 1.5vh; text-align:right; }
+  #navi { opacity:.20;  }
+  #navi:hover { opacity:1.0;  }
+  #navi a { opacity:0; font-size:1.0vh; display:none; padding: .3vh 0; text-decoration: none; color:#000; }
+  #navi:hover a { display:block; opacity:.50 }
+  #navi:hover a:hover { opacity:1 }
   `],
   template: `
   <div>
@@ -15,7 +18,7 @@ import { Router } from '@angular/router';
     <nav id="navi" *ngIf="debug">
 	    <code><b>{{branch.toUpperCase()}}</b></code>
   	  <div id="navi-branches">
-        <a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}} 🌍</a>
+        <a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}}</a>
   	  </div>
     </nav>
   </div>
