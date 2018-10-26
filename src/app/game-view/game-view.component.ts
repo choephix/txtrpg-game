@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
 import { Game } from './../game/game';
+import { WorldDataService } from './../game/data-service';
 
 @Component({
   selector: 'app-game-view',
@@ -16,16 +17,20 @@ export class GameViewComponent implements OnInit {
   game:Game = new Game()
 
   debby:string = ""
+  
+  constructor( public dataService:WorldDataService ) {}
 
-  ngOnInit() {
-    this.game.start()
-    this.game.onChange = () => this.onChange()
-  }
-
-  ngAfterViewInit()
+  ngOnInit() { this.startGame("develop") }
+  
+  startGame( branch:string )
   {
-    this.onChange()
+    this.dataService.load( "develop", data => {
+      this.game.start( data )
+      this.game.onChange = () => this.onChange()
+    } )
   }
+
+  ngAfterViewInit() { this.onChange() }
 
   onChange()
   {

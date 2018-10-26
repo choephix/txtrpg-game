@@ -41,7 +41,11 @@ div, p { transition: opacity .150s, color .150s; }
   🗺 {{game.getCurrentNode()}}
 </p>
 
-<div style="text-align:center" (click)="onChange()"
+<div style="text-align:center" *ngIf="!!dataService.busy">...</div>
+
+<div style="text-align:center" 
+     *ngIf="!dataService.busy"
+     (click)="onChange()"
      id="main" #main >
 
   <div id="journal"

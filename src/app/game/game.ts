@@ -1,3 +1,6 @@
+// import { WorldDataWrapper } from './data-service';
+import { GameData } from './data-service';
+
 declare var require:any
 
 export class Game
@@ -5,15 +8,19 @@ export class Game
   public journal:string[] = [];
   public options:Option[] = [];
 
-  public worldData = null;
+  public worldData:any = null;
+  
+  public data:GameData = null;
   public context:Context = new Context;
 
   private actionHandler:ActionHandler = new ActionHandler();
 
   public onChange:()=>void;
 
-  public start():void
+  public start( gamedata:GameData ):void
   {
+    this.data = gamedata
+    
     this.worldData = require('./mock-world.2.json');
 
     this.context.currentTime = new Date(this.worldData.global.time);
@@ -31,14 +38,14 @@ export class Game
     this.journal.push(result.journal_entry);
     this.options = result.options;
 
-    const new_time = this.context.currentTime.getTime() +result.timeDelta*1000;
+    const new_time = this.context.currentTime.getTime() + result.timeDelta*1000;
     this.context.currentTime = new Date(new_time)
 
     console.log(`Action result\n`,result)
     console.log(`Context\n`,this.context)
 
     try { if ( this.onChange ) this.onChange() }
-    catch( e ) { console.log("onchange errorred "+e) }
+    catch( e ) { console.log("onchange errorred " + e) }
   }
 
   public selectOption(index:number):void
