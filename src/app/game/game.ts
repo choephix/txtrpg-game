@@ -23,8 +23,6 @@ export class Game
     
     this.worldData = require('./mock-world.2.json');
 
-    this.context.currentTime = new Date(this.worldData.global.time);
-
     const start_node = this.worldData.start.node;
     const start_text = this.worldData.start.on_start;
     this.go( {action:"goto", node:start_node, pre:start_text} );
@@ -37,9 +35,6 @@ export class Game
     const result = this.actionHandler.handleAction( action, this.worldData, this.context );
     this.journal.push(result.journal_entry);
     this.options = result.options;
-
-    const new_time = this.context.currentTime.getTime() + result.timeDelta*1000;
-    this.context.currentTime = new Date(new_time)
 
     console.log(`Action result\n`,result)
     console.log(`Context\n`,this.context)
@@ -63,13 +58,12 @@ export class Game
   // { return `${this.context.currentNode} / ${this.getNode(this.context.currentNode).title}` }
   { return `${this.context.currentNode}` }
 
-  public getTime() { return this.context.currentTime }
+  public getTime() { return 0 }
 }
 
 class Context
 {
   currentNode:string
-  currentTime:Date
 }
 
 class ActionHandler
@@ -103,7 +97,6 @@ class ActionHandler
       return {
         journal_entry : `${placeAliases(params.pre)}\nI was at ${placeAliases(node.title)}`,
         options: options,
-        timeDelta: 1.0 + Math.random() * 29.0
       }
     }
   }
@@ -113,7 +106,6 @@ class ActionResult
 {
   journal_entry:string
   options:Option[]
-  timeDelta:number=0.0
 }
 
 class Option
