@@ -36,9 +36,9 @@ div, p { transition: opacity .150s, color .150s; }
 </style>
 
 <p id="hud">
-  🕓 {{game.getTime() | date:'H:mm:ss.SSS'}}
-  <br/>
-  🗺 {{game.getCurrentNode()}}
+  <!--🕓 {{game.getTime() | date:'H:mm:ss.SSS'}}-->
+  <!--<br/>-->
+  🗺 {{game.context.currentNode?game.context.currentNode.slug:"N/A"}}
 </p>
 
 <div style="text-align:center" *ngIf="!!dataService.busy">...</div>

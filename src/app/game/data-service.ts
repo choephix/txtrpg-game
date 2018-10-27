@@ -41,7 +41,7 @@ export class GameData
   world:WorldData
   journal:JournalData
 }
-export interface IniParams { spawnnode:string }
+export interface IniParams { spawn_node:string }
 
 export class WorldData
 {
