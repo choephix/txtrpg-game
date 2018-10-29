@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigashtiService } from './services/navigashti.service';
 
 @Component({
   selector: 'app-root',
@@ -15,25 +15,17 @@ import { Router } from '@angular/router';
   template: `
   <div>
     <router-outlet></router-outlet>
-    <nav id="navi" *ngIf="debug">
-	    <code><b>{{branch.toUpperCase()}}</b></code>
+    <nav id="navi" *ngIf="navi.debug">
+	    <code><b>{{navi.branch.toUpperCase()}}</b></code>
   	  <div id="navi-branches">
-        <a *ngFor="let b of ALL_BRANCHES" routerLink="{{router.url.replace(branch,b)}}" routerLinkActive="active">{{b}}</a>
+        <a *ngFor="let b of navi.ALL_BRANCHES" 
+            routerLink="/{{b}}{{navi.debug?'/debug':''}}" 
+            routerLinkActive="active">{{b}}</a>
   	  </div>
     </nav>
   </div>
   `,
 })
 export class AppComponent {
-	public ALL_BRANCHES:string[] = ["master","develop","poc","lorem"]
-	public branch:string = "develop"
-	public debug:boolean = false
-  constructor( public router:Router )
-  { 
-    console.log(router)
-    router.events.subscribe( e => {
-      this.branch = router.url.match(/^\/?([^\/]*)/)[1]
-      this.debug = router.url.includes("/debug")
-    } ) 
-  }
+  constructor( public navi:NavigashtiService ) { }
 }

@@ -1,7 +1,4 @@
-// import { WorldDataWrapper } from './data-service';
-import { GameData, Node } from './data-service';
-
-declare var require:any
+import { GameData, Node } from './data-models';
 
 export class Game
 {
@@ -15,7 +12,7 @@ export class Game
 
   public onChange:()=>void;
 
-  public start( gamedata:GameData ):void
+  constructor( gamedata:GameData )
   {
     this.data = gamedata
     this.actionHandler = new ActionHandler()
