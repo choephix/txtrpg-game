@@ -25,4 +25,4 @@ export class JournalData
 }
 export interface Snippet { key:string, text:string }
 export interface Alias { entity:string, text:string }
-export interface ActionGoto { from:string, to:string, params:string, handle:string, text:string }
+export interface ActionGoto { from:string, to:string, params?:string, handle?:string, text?:string }
