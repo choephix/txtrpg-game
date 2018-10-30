@@ -1,5 +1,4 @@
 import * as models from './data-models';
-import { Testability } from '@angular/core';
 
 export class Game
 {
@@ -22,9 +21,10 @@ export class Game
   {
     this.options = []
 
-    const result = this.actionHandler.handleAction( action, this.data, this.context );
-    this.journal.push(result.journal_entry);
-    this.options = result.options;
+    for ( let result of this.actionHandler.resolveAction( action, this.data, this.context ) )
+      this.journal.push( result );
+
+    this.options = this.actionHandler.makeOptionsList( this.data, this.context )
 
     // console.info(`Action result\n`,result)
     // console.info(`Context\n`,this.context)
@@ -50,85 +50,101 @@ class Context
   history:any[] = []
 }
 
+class WordsmithDataWrapper
+{
+  constructor( private data:models.JournalData ) {}
+      
+  public getHandle( from:models.Node, to:models.Node, params ):string
+  {
+    for ( let row of this.queryValidRows( from, to, params ) )
+      if ( row.handle )
+        return row.handle
+    return `Go to ${to.slug}`
+  }
+
+  public getText( from:models.Node, to:models.Node, params ):string
+  {
+    for ( let row of this.queryValidRows( from, to, params ) )
+      if ( row.text )
+        return row.text
+    return params === "spawn" 
+        ? `I spawned at ${to.slug}` 
+        : `I went to ${to.slug}`
+  }
+
+  private queryValidRows( from:models.Node, to:models.Node, params=null )
+  {
+    return this.data.actions.goto
+      .filter( a => { return ( !from || !a.from || a.from == from.slug ) && 
+                             ( !to   || !a.to   || a.to == to.slug     ) &&
+                             ( !a.params || params == a.params ) } )
+      .sort( ( a, b ) => {
+        let aa = a.params ? a.params.length : 0
+        let bb = b.params ? b.params.length : 0
+        return bb - aa
+      } )
+  }
+}
+
+class WorldDataWrapper
+{
+  constructor( private data:models.WorldData ) {}
+
+  public getNode( uidOrSlug:string ):models.Node
+  {
+    let node = null
+    for ( let x of this.data.nodes )
+      if ( x.uid === uidOrSlug || x.slug === uidOrSlug )
+        node = x
+    return node
+  }
+}
+
 class ActionHandler
 {
   // constructor( private data:GameData ) { }
 
-
-
-  public handleAction( params, data:models.GameData, context ):ActionResult
+  public resolveAction( params, data:models.GameData, context ):string[]
   {
-    console.log(`Handling Action\n`,params)
+    // console.log(`Resolving Action\n`,params)
 
-    const getNode = ( uidOrSlug:string ):models.Node =>
-    {
-      let node = null
-      for ( let x of data.world.nodes )
-        if ( x.uid === uidOrSlug || x.slug === uidOrSlug )
-          node = x
-      return node
-    }
+    let world = new WorldDataWrapper( data.world )
+    let wordsmith = new WordsmithDataWrapper( data.journal )
 
     if ( params.action === "goto" || params.action === "spawn" )
     {
       let spawned = params.action == "spawn"
       let prev = context.currentNode;
-      let node = 
-      context.currentNode = getNode( params.node )
+      let next = 
+      context.currentNode = world.getNode( params.node )
       
-      function getHandle( from:models.Node, to:models.Node, params ):string
-      {
-        for ( let row of queryValidRows( from, to, params ) )
-          if ( row.handle )
-            return row.handle
-        return `Go to ${to.slug}`
-      }
-
-      function getText( from:models.Node, to:models.Node, params ):string
-      {
-        for ( let row of queryValidRows( from, to, params ) )
-          if ( row.text )
-            return row.text
-        return params === "spawn" 
-            ? `I spawned at ${to.slug}` 
-            : `I went to ${to.slug}`
-      }
-
-      function queryValidRows( from:models.Node, to:models.Node, params=null )
-      {
-        return data.journal.actions.goto
-          .filter( a => { return ( !from || !a.from || a.from == from.slug ) && 
-                                 ( !to   || !a.to   || a.to == to.slug     ) &&
-                                 ( !a.params || params == a.params ) } )
-          .sort( ( a, b ) => {
-            let aa = a.params ? a.params.length : 0
-            let bb = b.params ? b.params.length : 0
-            return bb - aa
-          } )
-      }
-      
-      const options = []
-      for ( let link of data.world.links )
-      {
-        if ( link.from !== node.uid )
-          continue
-        
-        let target = getNode( link.to )
-
-        options.push(
-        {
-          t:getHandle( node, target, null ),
-          pa:{ action:"goto", node:target.uid } 
-        } )
-      }
-      
-      return {
-        journal_entry : getText( prev, node, spawned ? "spawn" : null ),
-        options: options,
-      }
+      let text = [ wordsmith.getText( prev, next, spawned ? "spawn" : null ) ]
+      return text
     }
   }
 
+  public makeOptionsList( data:models.GameData, context ):Option[]
+  {
+    let world = new WorldDataWrapper( data.world )
+    let wordsmith = new WordsmithDataWrapper( data.journal )
+    let currentNode = context.currentNode
+    let options = []
+    for ( let link of data.world.links )
+    {
+      if ( link.from !== currentNode.uid )
+        continue
+      
+      let target = world.getNode( link.to )
+
+      options.push(
+      {
+        t: wordsmith.getHandle( currentNode, target, null ),
+        pa: { action:"goto", node:target.uid } 
+      } )
+    }
+    
+    return options
+  }
 
   private placeAliases( text:string ):string
   {
