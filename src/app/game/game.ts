@@ -21,12 +21,13 @@ export class Game
   {
     this.options = []
 
-    for ( let result of this.actionHandler.resolveAction( actionParams, this.data, this.context ) )
+    for ( let result of this.actionHandler.resolveAction( actionParams, this.data, this.context ) ) {
       this.journal.push( result );
+    }
+      
+    this.context.history.unshift( actionParams )
 
     this.options = this.actionHandler.makeOptionsList( this.data, this.context )
-    
-    this.context.history.unshift( actionParams )
 
     try { if ( this.onChange ) this.onChange() }
     catch( e ) { console.log("onchange errorred " + e) }
@@ -53,22 +54,19 @@ class WordsmithDataWrapper
   public getHandle( from:models.Node, to:models.Node, params ):string
   {
     for ( let row of this.queryValidRows( from, to, params ) )
-      if ( row.handle )
-        return row.handle
-    if ( params === "back" )
-      return `Go back to ${to.slug}.`
+      if ( row.handle ) return row.handle
+    if ( params === "back" )    return `Go back to ${to.slug}.`
+    if ( params === "circle" )  return `Circle back to ${to.slug}.`
     return `Go to ${to.slug}`
   }
 
   public getText( from:models.Node, to:models.Node, params ):string
   {
     for ( let row of this.queryValidRows( from, to, params ) )
-      if ( row.text )
-        return row.text
-    if ( params === "spawn" )
-      return `I spawned at ${to.slug}.`
-    if ( params === "back" )
-      return `I retrurned to ${to.slug}.`
+      if ( row.text ) return row.text
+    if ( params === "spawn" )   return `I spawned at ${to.slug}.`
+    if ( params === "back" )    return `I returned to ${to.slug}.`
+    if ( params === "circle" )  return `I circled right back to ${to.slug}.`
     return `I went to ${to.slug}.`
   }
 
@@ -111,19 +109,42 @@ class ActionHandler
     let world = new WorldDataWrapper( data.world )
     let wordsmith = new WordsmithDataWrapper( data.journal )
 
-    if ( params.action === "goto" || params.action === "spawn" )
+    if ( params.action === "spawn" )
     {
-      let spawned = params.action == "spawn"
       let prev = context.currentNode;
       let next = 
       context.currentNode = world.getNode( params.node )
+      return [ wordsmith.getText( prev, next, "spawn" ) ]
+    }
+
+    if ( params.action === "goto" || params.action === "spawn" )
+    {
+      let prev = context.currentNode;
+      let next = world.getNode( params.node )
+
+      let isBackward = this.isBackward( next, context )
+      let isCircular = this.isCircular( next, context )
+      console.log(isBackward,isCircular,next.uid,JSON.stringify(context.history,null,2))
+
+      let param = null
+      if ( isBackward )
+        param = "back"
+      else
+      if ( isCircular && !isBackward ) 
+        param = "circle"
       
-      let text = [ wordsmith.getText( prev, next, spawned ? "spawn" : null ) ]
+      /// Actually do the magic
+      context.currentNode = next
+
+      let text = [ wordsmith.getText( prev, next, param ) ]
       return text
     }
+
     if ( params.action === "lookaround" ) return ["I looked around. It's nice here."]
+    
     if ( params.action === "lookdown" ) return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
           +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
+    
     if ( params.action === "picknose" ) return ["I jammed a finger up my nose."]
   }
 
@@ -140,14 +161,22 @@ class ActionHandler
       if ( link.from !== currentNode.uid )
         continue
       
-      let target = world.getNode( link.to )
+      let next = world.getNode( link.to )
 
-      let isBackward = this.isBackward( target, context )
+      let isBackward = this.isBackward( next, context )
+      let isCircular = this.isCircular( next, context )
+
+      let param = null
+      if ( isBackward )
+        param = "back"
+      else
+      if ( isCircular )
+        param = "circle"
 
       options.push(
       {
-        handle: wordsmith.getHandle( currentNode, target, isBackward ? "back" : null ),
-        params: { action:"goto", node:target.uid },
+        handle: wordsmith.getHandle( currentNode, next, param ),
+        params: { action:"goto", node:next.uid },
         weight: isBackward ? 10 : 12
       } )
     }
@@ -175,12 +204,37 @@ class ActionHandler
     return options.sort( (a,b) => b.weight - a.weight )
   }
 
+  private nodeEquals( a:models.Node, b:any )
+  { return a === b || a.uid === b || a.slug === b }
+
   private isBackward( to:models.Node, context:Context ):boolean // +param max time ago
   {
     for ( let actionParams of context.history )
       if ( actionParams.action === "goto" )
-        return actionParams.node === to.slug
-            || actionParams.node === to.uid
+        if ( this.nodeEquals( context.currentNode, actionParams.node ) )
+        {
+          console.log(0,to,actionParams)
+          continue
+        }
+        else
+        {
+          console.log(1,to,actionParams,context.currentNode)
+          return this.nodeEquals( to, actionParams.node )
+        }
+    return false
+  }
+
+  private isCircular( to:models.Node, context:Context ):boolean // +param max time ago
+  {
+    for ( let actionParams of context.history )
+      if ( actionParams.action != "goto" )
+        return false
+      else
+      if ( this.nodeEquals( context.currentNode, actionParams.node ) )
+        continue
+      else
+      if ( this.nodeEquals( to, actionParams.node ) )
+        return true
     return false
   }
 
