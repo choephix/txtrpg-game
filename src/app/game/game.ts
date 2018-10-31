@@ -37,7 +37,7 @@ export class Game
   {
     // console.info(`Selected Option [${index}]`);
 
-    this.go( this.options[index].pa );
+    this.go( this.options[index].params );
   }
 
   public getCurrentNode():Node { return this.context.currentNode }
@@ -68,8 +68,8 @@ class WordsmithDataWrapper
       if ( row.text )
         return row.text
     return params === "spawn" 
-        ? `I spawned at ${to.slug}` 
-        : `I went to ${to.slug}`
+        ? `I spawned at ${to.slug}.` 
+        : `I went to ${to.slug}.`
   }
 
   private queryValidRows( from:models.Node, to:models.Node, params=null )
@@ -121,6 +121,10 @@ class ActionHandler
       let text = [ wordsmith.getText( prev, next, spawned ? "spawn" : null ) ]
       return text
     }
+    if ( params.action === "lookaround" ) return ["I looked around. It's nice here."]
+    if ( params.action === "lookdown" ) return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
+          +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
+    if ( params.action === "picknose" ) return ["I jammed a finger up my nose."]
   }
 
   public makeOptionsList( data:models.GameData, context ):Option[]
@@ -129,6 +133,8 @@ class ActionHandler
     let wordsmith = new WordsmithDataWrapper( data.journal )
     let currentNode = context.currentNode
     let options = []
+
+    /// NAVIGATION
     for ( let link of data.world.links )
     {
       if ( link.from !== currentNode.uid )
@@ -138,10 +144,31 @@ class ActionHandler
 
       options.push(
       {
-        t: wordsmith.getHandle( currentNode, target, null ),
-        pa: { action:"goto", node:target.uid } 
+        handle: wordsmith.getHandle( currentNode, target, null ),
+        params: { action:"goto", node:target.uid },
+        hidden: false
       } )
     }
+
+    /// EXTRA
+    options.push(
+      {
+        handle: "Inspect your surroundings",
+        params: { action:"lookaround", node:currentNode },
+        hidden: true
+      } )
+    options.push(
+      {
+        handle: "Look at your shoes",
+        params: { action:"lookdown" },
+        hidden: true
+      } )
+    options.push(
+      {
+        handle: "Pick your nose",
+        params: { action:"picknose" },
+        hidden: true
+      } )
     
     return options
   }
@@ -155,16 +182,11 @@ class ActionHandler
   }
 }
 
-class ActionResult
-{
-  journal_entry:string
-  options:Option[]
-}
-
 class Option
 {
-  t:string
-  pa:object
+  handle:string
+  params:object
+  hidden:boolean
 }
 
 

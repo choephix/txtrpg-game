@@ -16,12 +16,16 @@ export class GameViewComponent
 
   game:Game
 
+  showHidden:boolean = false
+
+  tutShowHidden:boolean = true
+
   constructor( private dataService:WorldDataService, private navi:NavigashtiService )
   {
     navi.callbacks_NavigationEnd.push( () => this.startGame( navi.branch ) )
   }
   
-  startGame( branch:string )
+  private startGame( branch:string )
   {
     this.dataService.load( branch, data => {
       this.game = new Game( data )
@@ -29,10 +33,34 @@ export class GameViewComponent
     } )
   }
 
-  ngAfterViewInit() 
-  { this.onChange() }
+  private ngAfterViewInit() 
+  { this.resetScroll() }
 
-  onChange()
+  onClickOption(e:MouseEvent,i)
+  {
+    this.game.selectOption(i)
+    // e.stopPropagation()
+  }
+
+  onClickExpandHidden(e:MouseEvent)
+  {
+    this.showHidden =! this.showHidden
+    this.tutShowHidden = false
+    e.stopPropagation()
+  }
+
+  onClickAnywhere(e:MouseEvent)
+  {
+    this.resetScroll()
+  }
+
+  private onChange()
+  {
+    this.showHidden = false
+    this.resetScroll()
+  }
+
+  private resetScroll()
   {
     try {
       const o = this._separator.nativeElement;

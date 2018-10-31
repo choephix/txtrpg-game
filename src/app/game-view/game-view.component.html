@@ -17,7 +17,7 @@ div, p { transition: opacity .150s, color .150s; }
 .option:hover { color:#EC6; }
 
 #journal { display:flex; justify-content:flex-end; flex-direction:column; width:100%; cursor:default; }
-/*#options { }*/
+/* #options { } */
 
 #journal-content { padding:7vh 4vh; }
 #options-content { padding:7vh 4vh; }
@@ -39,16 +39,18 @@ div, p { transition: opacity .150s, color .150s; }
 
 <div style="text-align:center" 
      *ngIf="!dataService.busy&&game!=undefined"
-     (click)="onChange()"
+     (click)="onClickAnywhere($event)"
      id="main" #main >
 
   <div id="journal"
        [style.minHeight]="getHalfWindowHeight()"
        class="fonted">
     <div id="journal-content">
-      <pre *ngFor="let entry of game.journal; let i = index"
-  	       [class.last]="i==game.journal.length-1"
-  	       class="entry">{{entry}}</pre>
+      <ng-container *ngFor="let entry of game.journal; let i = index">
+        <pre 
+             [class.last]="i==game.journal.length-1"
+             class="entry">{{entry}}</pre>
+      </ng-container>
     </div>
   </div>
 
@@ -60,9 +62,16 @@ div, p { transition: opacity .150s, color .150s; }
        [style.minHeight]="getHalfWindowHeight()"
        class="fonted">
     <div id="options-content">
-      <pre *ngFor="let option of game.options; let i = index"
-         (click)="game.selectOption(i)"
-         class="option">— {{option.t}} —</pre>
+      <ng-container *ngFor="let option of game.options; let i = index">
+          <pre *ngIf="showHidden || !option.hidden"
+               (click)="onClickOption($event,i)"
+               class="option">— {{option.handle}} —</pre>
+      </ng-container>
+      
+      <pre 
+          [style.opacity]=".8"
+          (click)="onClickExpandHidden($event)"
+          class="option">{{showHidden?"-":(tutShowHidden?"(more)\n":"")+"⚜"}}</pre>
     </div>
   </div>
 
