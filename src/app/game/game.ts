@@ -17,17 +17,16 @@ export class Game
     this.go( {action:"spawn", node:this.data.ini.spawn_node} )
   }
 
-  private go( action ):void
+  private go( actionParams ):void
   {
     this.options = []
 
-    for ( let result of this.actionHandler.resolveAction( action, this.data, this.context ) )
+    for ( let result of this.actionHandler.resolveAction( actionParams, this.data, this.context ) )
       this.journal.push( result );
 
     this.options = this.actionHandler.makeOptionsList( this.data, this.context )
-
-    // console.info(`Action result\n`,result)
-    // console.info(`Context\n`,this.context)
+    
+    this.context.history.unshift( actionParams )
 
     try { if ( this.onChange ) this.onChange() }
     catch( e ) { console.log("onchange errorred " + e) }
@@ -35,18 +34,15 @@ export class Game
 
   public selectOption(index:number):void
   {
-    // console.info(`Selected Option [${index}]`);
-
-    this.go( this.options[index].params );
+    let option = this.options[index]
+    console.debug( `Selected Option [${index}]`, option );
+    this.go( option.params );
   }
-
-  public getCurrentNode():Node { return this.context.currentNode }
-  public getTime() { return 0 }
 }
 
 class Context 
 { 
-  currentNode:Node
+  currentNode:models.Node
   history:any[] = []
 }
 
@@ -59,6 +55,8 @@ class WordsmithDataWrapper
     for ( let row of this.queryValidRows( from, to, params ) )
       if ( row.handle )
         return row.handle
+    if ( params === "back" )
+      return `Go back to ${to.slug}.`
     return `Go to ${to.slug}`
   }
 
@@ -67,9 +65,11 @@ class WordsmithDataWrapper
     for ( let row of this.queryValidRows( from, to, params ) )
       if ( row.text )
         return row.text
-    return params === "spawn" 
-        ? `I spawned at ${to.slug}.` 
-        : `I went to ${to.slug}.`
+    if ( params === "spawn" )
+      return `I spawned at ${to.slug}.`
+    if ( params === "back" )
+      return `I retrurned to ${to.slug}.`
+    return `I went to ${to.slug}.`
   }
 
   private queryValidRows( from:models.Node, to:models.Node, params=null )
@@ -104,7 +104,7 @@ class ActionHandler
 {
   // constructor( private data:GameData ) { }
 
-  public resolveAction( params, data:models.GameData, context ):string[]
+  public resolveAction( params, data:models.GameData, context:Context ):string[]
   {
     // console.log(`Resolving Action\n`,params)
 
@@ -127,7 +127,7 @@ class ActionHandler
     if ( params.action === "picknose" ) return ["I jammed a finger up my nose."]
   }
 
-  public makeOptionsList( data:models.GameData, context ):Option[]
+  public makeOptionsList( data:models.GameData, context:Context ):Option[]
   {
     let world = new WorldDataWrapper( data.world )
     let wordsmith = new WordsmithDataWrapper( data.journal )
@@ -142,11 +142,13 @@ class ActionHandler
       
       let target = world.getNode( link.to )
 
+      let isBackward = this.isBackward( target, context )
+
       options.push(
       {
-        handle: wordsmith.getHandle( currentNode, target, null ),
+        handle: wordsmith.getHandle( currentNode, target, isBackward ? "back" : null ),
         params: { action:"goto", node:target.uid },
-        hidden: false
+        weight: isBackward ? 10 : 12
       } )
     }
 
@@ -155,22 +157,31 @@ class ActionHandler
       {
         handle: "Inspect your surroundings",
         params: { action:"lookaround", node:currentNode },
-        hidden: true
+        weight: -1
       } )
     options.push(
       {
         handle: "Look at your shoes",
         params: { action:"lookdown" },
-        hidden: true
+        weight: -1
       } )
     options.push(
       {
         handle: "Pick your nose",
         params: { action:"picknose" },
-        hidden: true
+        weight: -1
       } )
     
-    return options
+    return options.sort( (a,b) => b.weight - a.weight )
+  }
+
+  private isBackward( to:models.Node, context:Context ):boolean // +param max time ago
+  {
+    for ( let actionParams of context.history )
+      if ( actionParams.action === "goto" )
+        return actionParams.node === to.slug
+            || actionParams.node === to.uid
+    return false
   }
 
   private placeAliases( text:string ):string
@@ -186,7 +197,5 @@ class Option
 {
   handle:string
   params:object
-  hidden:boolean
+  weight:number
 }
-
-

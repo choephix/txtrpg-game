@@ -63,7 +63,7 @@ div, p { transition: opacity .150s, color .150s; }
        class="fonted">
     <div id="options-content">
       <ng-container *ngFor="let option of game.options; let i = index">
-          <pre *ngIf="showHidden || !option.hidden"
+          <pre *ngIf="showHidden || option.weight > 0.5"
                (click)="onClickOption($event,i)"
                class="option">— {{option.handle}} —</pre>
       </ng-container>
