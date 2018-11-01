@@ -14,18 +14,18 @@ export class Game
   constructor( public data:models.GameData )
   {
     this.actionHandler = new ActionHandler()
-    this.go( {action:"spawn", node:this.data.ini.spawn_node} )
+    this.go( new Act( "spawn", { to:this.data.ini.spawn_node } ) )
   }
 
-  private go( actionParams ):void
+  private go( act:Act ):void
   {
     this.options = []
 
-    for ( let result of this.actionHandler.resolveAction( actionParams, this.data, this.context ) ) {
+    let results = this.actionHandler.resolveAction( act, this.data, this.context )
+    for ( let result of results )
       this.journal.push( result );
-    }
       
-    this.context.history.unshift( actionParams )
+    this.context.history.unshift( act )
 
     this.options = this.actionHandler.makeOptionsList( this.data, this.context )
 
@@ -37,45 +37,48 @@ export class Game
   {
     let option = this.options[index]
     console.debug( `Selected Option [${index}]`, option );
-    this.go( option.params );
+    this.go( option.act );
   }
 }
 
 class Context 
 { 
   currentNode:models.Node
-  history:any[] = []
+  history:Act[] = []
 }
 
 class WordsmithDataWrapper
 {
   constructor( private data:models.JournalData ) {}
       
-  public getHandle( from:models.Node, to:models.Node, params ):string
+  public getHandle( from:models.Node, to:models.Node, flags:string[] ):string
   {
-    for ( let row of this.queryValidRows( from, to, params ) )
+    for ( let row of this.queryValidRows( from, to, flags ) )
       if ( row.handle ) return row.handle
-    if ( params === "back" )    return `Go back to ${to.slug}.`
-    if ( params === "circle" )  return `Circle back to ${to.slug}.`
+    if ( flags.includes( "back" ) )   return `Go back to ${to.slug}.`
+    if ( flags.includes( "circle" ) ) return `Circle back to ${to.slug}.`
     return `Go to ${to.slug}`
   }
 
-  public getText( from:models.Node, to:models.Node, params ):string
+  public getText( from:models.Node, to:models.Node, flags:string[] ):string
   {
-    for ( let row of this.queryValidRows( from, to, params ) )
+    for ( let row of this.queryValidRows( from, to, flags ) )
       if ( row.text ) return row.text
-    if ( params === "spawn" )   return `I spawned at ${to.slug}.`
-    if ( params === "back" )    return `I returned to ${to.slug}.`
-    if ( params === "circle" )  return `I circled right back to ${to.slug}.`
+    if ( flags.includes( "spawn" ) )  return `I spawned at ${to.slug}.`
+    if ( flags.includes( "back" ) )   return `I returned to ${to.slug}.`
+    if ( flags.includes( "circle" ) ) return `I circled right back to ${to.slug}.`
     return `I went to ${to.slug}.`
   }
 
-  private queryValidRows( from:models.Node, to:models.Node, params=null )
+  private queryValidRows( from:models.Node, to:models.Node, flags:string[] )
   {
     return this.data.actions.goto
-      .filter( a => { return ( !from || !a.from || a.from == from.slug ) && 
-                             ( !to   || !a.to   || a.to == to.slug     ) &&
-                             ( !a.params || params == a.params ) } )
+      .filter( a => {
+          if ( from && a.from && from.slug != a.from && from.uid != a.from ) return false
+          if ( to && a.to && to.slug != a.to && to.uid != a.to ) return false
+          if ( a.params && !flags.includes( a.params ) ) return false
+          return true
+        } )
       .sort( ( a, b ) => {
         let aa = a.params ? a.params.length : 0
         let bb = b.params ? b.params.length : 0
@@ -100,52 +103,49 @@ class WorldDataWrapper
 
 class ActionHandler
 {
-  // constructor( private data:GameData ) { }
-
-  public resolveAction( params, data:models.GameData, context:Context ):string[]
+  private resolverFunctions:{[actType:string]:(act?:Act,data?:models.GameData,context?:Context)=>string[]} =
   {
-    // console.log(`Resolving Action\n`,params)
-
-    let world = new WorldDataWrapper( data.world )
-    let wordsmith = new WordsmithDataWrapper( data.journal )
-
-    if ( params.action === "spawn" )
+    "spawn": (act,data,context) => 
     {
+      let world = new WorldDataWrapper( data.world )
+      let wordsmith = new WordsmithDataWrapper( data.journal )
+      
       let prev = context.currentNode;
       let next = 
-      context.currentNode = world.getNode( params.node )
-      return [ wordsmith.getText( prev, next, "spawn" ) ]
-    }
-
-    if ( params.action === "goto" || params.action === "spawn" )
+      context.currentNode = world.getNode( act.params.to )
+      return [ wordsmith.getText( prev, next, ["spawn"] ) ]
+    },
+    "goto": (act,data,context) => 
     {
-      let prev = context.currentNode;
-      let next = world.getNode( params.node )
-
-      let isBackward = this.isBackward( next, context )
-      let isCircular = this.isCircular( next, context )
-      console.log(isBackward,isCircular,next.uid,JSON.stringify(context.history,null,2))
-
-      let param = null
-      if ( isBackward )
-        param = "back"
-      else
-      if ( isCircular && !isBackward ) 
-        param = "circle"
+      let world = new WorldDataWrapper( data.world )
+      let wordsmith = new WordsmithDataWrapper( data.journal )
       
-      /// Actually do the magic
+      let prev = context.currentNode;
+      let next = world.getNode( act.params.to )
+
       context.currentNode = next
+      return [ wordsmith.getText( prev, next, act.flags ) ]
+    },
+    "lookaround": () => 
+    {
+      return ["I looked around. It's nice here."]
+    },
+    "lookdown": () => 
+    {
+      return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
+             +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
+    },
+    "picknose": () => 
+    {
+      return ["I jammed a finger up my nose."]
+    },
+  }
 
-      let text = [ wordsmith.getText( prev, next, param ) ]
-      return text
-    }
-
-    if ( params.action === "lookaround" ) return ["I looked around. It's nice here."]
-    
-    if ( params.action === "lookdown" ) return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
-          +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
-    
-    if ( params.action === "picknose" ) return ["I jammed a finger up my nose."]
+  public resolveAction( act:Act, data:models.GameData, context:Context ):string[]
+  {
+    console.log(JSON.stringify(act,null,2))
+    let func = this.resolverFunctions[act.type]
+    return func( act, data, context )
   }
 
   public makeOptionsList( data:models.GameData, context:Context ):Option[]
@@ -166,39 +166,39 @@ class ActionHandler
       let isBackward = this.isBackward( next, context )
       let isCircular = this.isCircular( next, context )
 
-      let param = null
+      let params = []
       if ( isBackward )
-        param = "back"
+        params.push( "back" )
       else
       if ( isCircular )
-        param = "circle"
+        params.push( "circle" )
 
       options.push(
       {
-        handle: wordsmith.getHandle( currentNode, next, param ),
-        params: { action:"goto", node:next.uid },
-        weight: isBackward ? 10 : 12
+        weight: isBackward ? 10 : 12,
+        handle: wordsmith.getHandle( currentNode, next, params ),
+        act: new Act( "goto", {to:next.uid}, params ),
       } )
     }
 
     /// EXTRA
     options.push(
       {
+        weight: -1,
         handle: "Inspect your surroundings",
-        params: { action:"lookaround", node:currentNode },
-        weight: -1
+        act: new Act("lookaround"),
       } )
-    options.push(
+      options.push(
       {
+        weight: -1,
         handle: "Look at your shoes",
-        params: { action:"lookdown" },
-        weight: -1
+        act: new Act("lookdown"),
       } )
-    options.push(
+      options.push(
       {
+        weight: -1,
         handle: "Pick your nose",
-        params: { action:"picknose" },
-        weight: -1
+        act: new Act("picknose"),
       } )
     
     return options.sort( (a,b) => b.weight - a.weight )
@@ -209,47 +209,44 @@ class ActionHandler
 
   private isBackward( to:models.Node, context:Context ):boolean // +param max time ago
   {
-    for ( let actionParams of context.history )
-      if ( actionParams.action === "goto" )
-        if ( this.nodeEquals( context.currentNode, actionParams.node ) )
-        {
-          console.log(0,to,actionParams)
+    for ( let act of context.history )
+      if ( act.type === "goto" )
+        if ( this.nodeEquals( context.currentNode, act.params.to ) )
           continue
-        }
         else
-        {
-          console.log(1,to,actionParams,context.currentNode)
-          return this.nodeEquals( to, actionParams.node )
-        }
+          return !act.flags.includes("back") && this.nodeEquals( to, act.params.to )
     return false
   }
 
   private isCircular( to:models.Node, context:Context ):boolean // +param max time ago
   {
-    for ( let actionParams of context.history )
-      if ( actionParams.action != "goto" )
+    for ( let act of context.history )
+      if ( act.type != "goto" )
         return false
       else
-      if ( this.nodeEquals( context.currentNode, actionParams.node ) )
+      if ( act.flags.includes("back") || act.flags.includes("circle") )
+        return false
+      else
+      if ( this.nodeEquals( context.currentNode, act.params.to ) )
         continue
       else
-      if ( this.nodeEquals( to, actionParams.node ) )
+      if ( this.nodeEquals( to, act.params.to ) )
         return true
     return false
   }
+}
 
-  private placeAliases( text:string ):string
-  {
-    //   const dict = world.aliases
-    //   for ( const alias in dict )
-    //     text = text.split(`${alias}`).join(dict[alias]);
-      return text
-  }
+class Act
+{
+  constructor( public type:"goto"|"spawn"|"lookaround"|"lookdown"|"picknose",
+               public params:any = {},
+               public flags:string[] = [] 
+             ) {}
 }
 
 class Option
 {
   handle:string
-  params:object
   weight:number
+  act:Act
 }
