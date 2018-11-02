@@ -5,15 +5,22 @@ export class Game
   public journal:string[] = []
   public options:Option[] = []
 
-  public context:Context = new Context
+  public context:Context
 
   private actionHandler:ActionHandler
 
   public onChange:()=>void;
 
+  public words:WordsmithDataWrapper
+  public world:WorldDataWrapper
+
   constructor( public data:models.GameData )
   {
-    this.actionHandler = new ActionHandler()
+    this.context = new Context()
+    this.words = new WordsmithDataWrapper(data.journal,this.context)
+    this.world = new WorldDataWrapper(data.world)
+
+    this.actionHandler = new ActionHandler(this.words,this.world)
     this.go( new Act( "spawn", { to:this.data.ini.spawn_node } ) )
   }
 
@@ -45,16 +52,31 @@ class Context
 { 
   currentNode:models.Node
   history:Act[] = []
+
+  nosepicks:number = 0
 }
 
 class WordsmithDataWrapper
 {
-  constructor( private data:models.JournalData ) {}
+  constructor( private data:models.JournalData, private context:Context ) {}
+
+  public codetotext( code:string, context:Context ):string
+  {
+    try { return eval( code ) }
+    catch(e) { return `... \n(ERROR)\n${e}\n ... ` }
+  }
+
+  public fixText( text:string ):string
+  {
+    return text.replace( 
+      /{{([^}]*)}}/gi, 
+      ( match, code ) => this.codetotext.call( null, code, this.context ) )
+  }
       
   public getHandle( from:models.Node, to:models.Node, flags:string[] ):string
   {
     for ( let row of this.queryValidRows( from, to, flags ) )
-      if ( row.handle ) return row.handle
+      if ( row.handle ) return this.fixText( row.handle )
     if ( flags.includes( "back" ) )   return `Go back to ${to.slug}.`
     if ( flags.includes( "circle" ) ) return `Circle back to ${to.slug}.`
     return `Go to ${to.slug}`
@@ -63,7 +85,7 @@ class WordsmithDataWrapper
   public getText( from:models.Node, to:models.Node, flags:string[] ):string
   {
     for ( let row of this.queryValidRows( from, to, flags ) )
-      if ( row.text ) return row.text
+      if ( row.text ) return this.fixText( row.text )
     if ( flags.includes( "spawn" ) )  return `I spawned at ${to.slug}.`
     if ( flags.includes( "back" ) )   return `I returned to ${to.slug}.`
     if ( flags.includes( "circle" ) ) return `I circled right back to ${to.slug}.`
@@ -103,28 +125,25 @@ class WorldDataWrapper
 
 class ActionHandler
 {
+  constructor ( private wordsmith:WordsmithDataWrapper, private world:WorldDataWrapper) {}
+
   private resolverFunctions:{[actType:string]:(act?:Act,data?:models.GameData,context?:Context)=>string[]} =
   {
     "spawn": (act,data,context) => 
     {
-      let world = new WorldDataWrapper( data.world )
-      let wordsmith = new WordsmithDataWrapper( data.journal )
-      
+      console.log("spoo",this,this.world,this.world.getNode)
       let prev = context.currentNode;
       let next = 
-      context.currentNode = world.getNode( act.params.to )
-      return [ wordsmith.getText( prev, next, ["spawn"] ) ]
+      context.currentNode = this.world.getNode( act.params.to )
+      return [ this.wordsmith.getText( prev, next, ["spawn"] ) ]
     },
     "goto": (act,data,context) => 
     {
-      let world = new WorldDataWrapper( data.world )
-      let wordsmith = new WordsmithDataWrapper( data.journal )
-      
       let prev = context.currentNode;
-      let next = world.getNode( act.params.to )
+      let next = this.world.getNode( act.params.to )
 
       context.currentNode = next
-      return [ wordsmith.getText( prev, next, act.flags ) ]
+      return [ this.wordsmith.getText( prev, next, act.flags ) ]
     },
     "lookaround": () => 
     {
@@ -135,8 +154,9 @@ class ActionHandler
       return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
              +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
     },
-    "picknose": () => 
+    "picknose": (act,data,context) => 
     {
+      context.nosepicks++
       return ["I jammed a finger up my nose."]
     },
   }
@@ -150,8 +170,6 @@ class ActionHandler
 
   public makeOptionsList( data:models.GameData, context:Context ):Option[]
   {
-    let world = new WorldDataWrapper( data.world )
-    let wordsmith = new WordsmithDataWrapper( data.journal )
     let currentNode = context.currentNode
     let options = []
 
@@ -161,7 +179,7 @@ class ActionHandler
       if ( link.from !== currentNode.uid )
         continue
       
-      let next = world.getNode( link.to )
+      let next = this.world.getNode( link.to )
 
       let isBackward = this.isBackward( next, context )
       let isCircular = this.isCircular( next, context )
@@ -176,7 +194,7 @@ class ActionHandler
       options.push(
       {
         weight: isBackward ? 10 : 12,
-        handle: wordsmith.getHandle( currentNode, next, params ),
+        handle: this.wordsmith.getHandle( currentNode, next, params ),
         act: new Act( "goto", {to:next.uid}, params ),
       } )
     }
