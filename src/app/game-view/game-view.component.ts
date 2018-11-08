@@ -20,7 +20,7 @@ export class GameViewComponent
 
   tutShowHidden:boolean = true
 
-  constructor( private dataService:WorldDataService, private navi:NavigashtiService )
+  constructor( public dataService:WorldDataService, public navi:NavigashtiService )
   {
     navi.callbacks_NavigationEnd.push( () => this.startGame( navi.branch ) )
   }
