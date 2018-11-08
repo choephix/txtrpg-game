@@ -1,106 +1,37 @@
-# TXTRPG-POC-Angular
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.4.
-
-
-----
-
-
-## Ubuntu Stack Setup
-
 ```
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+     s                      s                                           
+    :8                     :8                                           
+   .88       uL   ..      .88       .u    .    .d``                     
+  :888ooo  .@88b  @88R   :888ooo  .d88B :@8c   @8Ne.   .u        uL     
+-*8888888 '"Y888k/"*P  -*8888888 ="8888f8888r  %8888:u@88N   .ue888Nc.. 
+  8888       Y888L       8888      4888>'88"    `888I  888. d88E`"888E` 
+  8888        8888       8888      4888> '       888I  888I 888E  888E  
+  8888        `888N      8888      4888>         888I  888I 888E  888E  
+ .8888Lu=  .u./"888&    .8888Lu=  .d888L .+    uW888L  888' 888E  888E  
+ ^%888*   d888" Y888*"  ^%888*    ^"8888*"    '*88888Nu88P  888& .888E  
+   'Y"    ` "Y   Y"       'Y"        "Y"      ~ '88888F`    *888" 888&  
+                                                 888 ^       `"   "888E 
+                                                 *8E        .dWi   `88E 
+                                                 '8>        4888~  J8%  
+                                                  "          ^"===*"` 
 
-sudo apt-get install -y nodejs
 
-(optional)
-sudo apt-get install -y build-essential
 
-npm install -g @angular/cli
+    ....      ..             ....               ...          
+  +^""888h. ~"888h       .x~X88888Hx.        xH88"`~ .x8X    
+ 8X.  ?8888X  8888f     H8X 888888888h.    :8888   .f"8888Hf 
+'888x  8888X  8888~    8888:`*888888888:  :8888>  X8L  ^""`  
+'88888 8888X   "88x:   88888:        `%8  X8888  X888h       
+ `8888 8888X  X88x.  . `88888          ?> 88888  !88888.     
+   `*` 8888X '88888X `. ?888%           X 88888   %88888     
+  ~`...8888X  "88888   ~*??.            > 88888 '> `8888>    
+   x8888888X.   `%8"  .x88888h.        <  `8888L %  ?888   ! 
+  '%"*8888888h.   "  :"""8888888x..  .x    `8888  `-*""   /  
+  ~    888888888!`   `    `*888888888"       "888.      :"   
+       X888^"""              ""***""           `""***~"`     
+       `88f                                                  
+        88                                                   
+        ""                                                   
 ```
 
-## git clone (in current directory)
-
-`git clone git@github.com:user/my-project.git .`
-
-## cloud9.io
-
-`ng serve --host 0.0.0.0 --port 8080 --disable-host-check --no-open --consolelogs`
-
-https://ide.c9.io/choephix/txtrpg-poc-angular-a
-
-https://txtrpg-poc-angular-a-choephix.c9users.io/
-
-https://txtrpg-poc-angular-a-choephix.c9users.io/edit/
-
-### ungit
-
-`ungit --port 8081 --ungit-bind-ip 0.0.0.0`
-
-https://txtrpg-poc-angular-a-choephix.c9users.io:8081/
-
-## codio.com
-
-`ng serve --host 0.0.0.0 --port 4200 --disable-host-check --no-open --consolelogs`
-
-https://codio.com/sginev/txtrpg-poc-angular/
-
-http://vienna-arthur-2111.codio.io/
-
-
-----
-
-
-# Project
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.5.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-
-
-----
-
-
-     ,-----.,--.                  ,--. ,---.   ,--.,------.  ,------.
-    '  .--./|  | ,---. ,--.,--. ,-|  || o   \  |  ||  .-.  \ |  .---'
-    |  |    |  || .-. ||  ||  |' .-. |`..'  |  |  ||  |  \  :|  `--, 
-    '  '--'\|  |' '-' ''  ''  '\ `-' | .'  /   |  ||  '--'  /|  `---.
-     `-----'`--' `---'  `----'  `---'  `--'    `--'`-------' `------'
-    ----------------------------------------------------------------- 
-
-
-Welcome to your Node.js project on Cloud9 IDE!
-
-This chat example showcases how to use `socket.io` with a static `express` server.
-
-## Running the server
-
-1) Open `server.js` and start the app by clicking on the "Run" button in the top menu.
-
-2) Alternatively you can launch the app from the Terminal:
-
-    $ node server.js
-
-Once the server is running, open the project in the shape of 'https://projectname-username.c9users.io/'. As you enter your name, watch the Users list (on the left) update. Once you press Enter or Send, the message is shared with all connected clients.
+## (play)
