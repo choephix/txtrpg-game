@@ -24,7 +24,7 @@ export class GameViewComponent
   {
     navi.callbacks_NavigationEnd.push( () => this.startGame( navi.branch ) )
   }
-  
+
   private startGame( branch:string )
   {
     this.dataService.load( branch, data => {
@@ -33,7 +33,7 @@ export class GameViewComponent
     } )
   }
 
-  private ngAfterViewInit() 
+  private ngAfterViewInit()
   { this.resetScroll() }
 
   onClickOption(e:MouseEvent,i)

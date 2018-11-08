@@ -1,35 +1,89 @@
 <style type="scss/text">
-div, p { transition: opacity .150s, color .150s; }
+* {
+  transition: color 200ms, opacity 200ms;
+}
 
-#hud { opacity:.01; position:fixed; font-family:'consolas'; font-size:1.5vh; cursor:copy ; }
-#hud:hover { opacity:2.00; }
+#hud {
+  opacity: 0.01;
+  position: fixed;
+  font-family: "consolas";
+  font-size: 1.5vh;
+  cursor: copy;
+}
+#hud:hover {
+  opacity: 2;
+}
+
+#main {
+  user-select: none;
+}
 
 /*.fonted pre { font-family: 'Princess Sofia'; font-size: 2vh; font-weight: lighter; }*/
 /*.fonted pre { font-family: 'Tangerine' !important; font-size: 5vh; }*/
 /*.fonted pre { font-family: 'Satisfy' !important; font-size: 2vh; }*/
 /*.fonted pre { font-family:'Kalam' !important; font-size:2vh; }*/
-.fonted pre { font-family:'calibri' !important; font-size:2vh; }
+.fonted pre { font-family: "calibri" !important; font-size: 2vh; }
 
-.entry { color:#c0c0c0; margin-top:2vh; overflow:hidden; white-space:pre-line; font-weight:100; }
-.entry.last { color:#777; }
+@keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+@keyframes scalein { from { transform: scale(.97,1) } }
 
-.option { display:block; cursor:pointer; color:#578; margin-bottom:4vh; font-weight:100; }
-.option:hover { color:#EC6; }
+.entry {
+  color: #c0c0c0;
+  margin-top: 2vh;
+  overflow: hidden;
+  white-space: pre-line;
+  font-weight: 100;
+}
+.entry.last {
+  color: #777;
+  animation: fadein 500ms, scalein 300ms;
+}
 
-#journal { display:flex; justify-content:flex-end; flex-direction:column; width:100%; cursor:default; }
+.option {
+  display: block;
+  cursor: pointer;
+  color: #578;
+  padding: 1vh;
+  margin: 1vh 0;
+  font-weight: 100;
+  animation: fadein 500ms forwards;
+  opacity:0;
+}
+.option:hover {
+  color: #ec6;
+}
+
+#journal {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  width: 100%;
+  cursor: default;
+}
 /* #options { } */
 
-#journal-content { padding:7vh 4vh; }
-#options-content { padding:7vh 4vh; }
+#journal-content {
+  padding: 7vh 4vh;
+}
+#options-content {
+  padding: 7vh 4vh;
+}
 
-#separator { opacity:.06; }
-#separator{ width:100%; position:absolute; -webkit-transform:translate(0, -50%); pointer-events:none; }
+#separator {
+  opacity: 0.06;
+}
+#separator {
+  width: 100%;
+  position: absolute;
+  -webkit-transform: translate(0, -50%);
+  pointer-events: none;
+}
 #separator img {
   display: block;
-  max-width:510px;
-  max-height:255px;
-  min-width:170px;
-  min-height:85px;
+  max-width: 510px;
+  max-height: 255px;
+  min-width: 170px;
+  min-height: 85px;
   width: 50vw;
   height: 25vw;
 }
@@ -37,7 +91,7 @@ div, p { transition: opacity .150s, color .150s; }
 
 <div style="text-align:center" *ngIf="!!dataService.busy">...</div>
 
-<div style="text-align:center" 
+<div style="text-align:center"
      *ngIf="!dataService.busy&&game!=undefined"
      (click)="onClickAnywhere($event)"
      id="main" #main >
@@ -47,7 +101,7 @@ div, p { transition: opacity .150s, color .150s; }
        class="fonted">
     <div id="journal-content">
       <ng-container *ngFor="let entry of game.journal; let i = index">
-        <pre 
+        <pre
              [class.last]="i==game.journal.length-1"
              class="entry">{{entry}}</pre>
       </ng-container>
@@ -59,18 +113,20 @@ div, p { transition: opacity .150s, color .150s; }
   </div>
 
   <div id="options"
+      *ngIf="game.ready"
        [style.minHeight]="getHalfWindowHeight()"
        class="fonted">
     <div id="options-content">
       <ng-container *ngFor="let option of game.options; let i = index">
           <pre *ngIf="showHidden || option.weight > 0.5"
                (click)="onClickOption($event,i)"
+               [style.animationDelay]="(250+50*i)+'ms'"
                class="option">— {{option.handle}} —</pre>
       </ng-container>
-      
-      <pre 
-          [style.opacity]=".8"
+
+      <pre
           (click)="onClickExpandHidden($event)"
+          [style.animationDelay]="(500+50*game.options.length)+'ms'"
           class="option">{{showHidden?"-":(tutShowHidden?"(more)\n":"")+"⚜"}}</pre>
     </div>
   </div>

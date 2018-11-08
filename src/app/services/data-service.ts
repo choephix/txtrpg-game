@@ -19,14 +19,14 @@ export class WorldDataService
   {
 		let bust:string = "" + new Date().valueOf() % 1000000
     let url:string = `https://raw.githubusercontent.com/${ACCO}/${REPO}/${branch}/${FILE}?${bust}`
-    
+
     this.busy = true
-    this.http.get( url ).subscribe( 
-      data => 
+    this.http.get( url ).subscribe(
+      data =>
       {
         this.data = <GameData>data;
         this.loaded = true
-        
+
         console.log( "loaded", this.data );
         callbackLoaded( this.data );
       },

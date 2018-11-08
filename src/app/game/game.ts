@@ -1,11 +1,49 @@
 import * as models from './data-models';
 
+function greet(code:string, this_act:Act, g:Game)
+{
+  let context = g.context
+  let words = g.words
+  let world = g.world
+
+  let flag_functions:{[fname:string]:()=>boolean} =
+  {
+    "back":():boolean => // +param max time ago
+    {
+      for ( let act of context.history )
+        if ( act.type === "goto" )
+          if ( this.nodeEquals( context.currentNode, act.params.to ) )
+            continue
+          else
+            return !act.flags.includes("back") && this.nodeEquals( this_act.params.to, act.params.to )
+      return false
+    },
+    "circular":():boolean => // +param max time ago
+    {
+      for ( let act of context.history )
+        if ( act.type != "goto" )
+          return false
+        else
+        if ( act.flags.includes("back") || act.flags.includes("circle") )
+          return false
+        else
+        if ( this.nodeEquals( context.currentNode, act.params.to ) )
+          continue
+        else
+        if ( this.nodeEquals( this_act.params.to, act.params.to ) )
+          return true
+      return false
+    }
+  }
+}
+
 export class Game
 {
   public journal:string[] = []
   public options:Option[] = []
 
   public context:Context
+  public ready:boolean
 
   private actionHandler:ActionHandler
 
@@ -31,25 +69,30 @@ export class Game
     let results = this.actionHandler.resolveAction( act, this.data, this.context )
     for ( let result of results )
       this.journal.push( result );
-      
-    this.context.history.unshift( act )
 
+    this.context.history.unshift( act )
     this.options = this.actionHandler.makeOptionsList( this.data, this.context )
+    this.ready = true
 
     try { if ( this.onChange ) this.onChange() }
     catch( e ) { console.log("onchange errorred " + e) }
+
+    console.log(this)
   }
 
   public selectOption(index:number):void
   {
     let option = this.options[index]
     console.debug( `Selected Option [${index}]`, option );
-    this.go( option.act );
+
+    this.ready = false
+    this.go( option.act )
+    // setTimeout( () => this.go( option.act ), 125 );
   }
 }
 
-class Context 
-{ 
+class Context
+{
   currentNode:models.Node
   history:Act[] = []
 
@@ -68,11 +111,11 @@ class WordsmithDataWrapper
 
   public fixText( text:string ):string
   {
-    return text.replace( 
-      /{{([^}]*)}}/gi, 
+    return text.replace(
+      /{{([^}]*)}}/gi,
       ( match, code ) => this.codetotext.call( null, code, this.context ) )
   }
-      
+
   public getHandle( from:models.Node, to:models.Node, flags:string[] ):string
   {
     for ( let row of this.queryValidRows( from, to, flags ) )
@@ -129,15 +172,15 @@ class ActionHandler
 
   private resolverFunctions:{[actType:string]:(act?:Act,data?:models.GameData,context?:Context)=>string[]} =
   {
-    "spawn": (act,data,context) => 
+    "spawn": (act,data,context) =>
     {
       console.log("spoo",this,this.world,this.world.getNode)
       let prev = context.currentNode;
-      let next = 
+      let next =
       context.currentNode = this.world.getNode( act.params.to )
       return [ this.wordsmith.getText( prev, next, ["spawn"] ) ]
     },
-    "goto": (act,data,context) => 
+    "goto": (act,data,context) =>
     {
       let prev = context.currentNode;
       let next = this.world.getNode( act.params.to )
@@ -145,16 +188,16 @@ class ActionHandler
       context.currentNode = next
       return [ this.wordsmith.getText( prev, next, act.flags ) ]
     },
-    "lookaround": () => 
+    "lookaround": () =>
     {
       return ["I looked around. It's nice here."]
     },
-    "lookdown": () => 
+    "lookdown": () =>
     {
       return ["I looked down and stared thoughtfully at my shoes. I had two.\n"
              +"I began wiggling my toes, but I couldn't seem them. This was probably because I had shoes over them."]
     },
-    "picknose": (act,data,context) => 
+    "picknose": (act,data,context) =>
     {
       context.nosepicks++
       return ["I jammed a finger up my nose."]
@@ -178,7 +221,7 @@ class ActionHandler
     {
       if ( link.from !== currentNode.uid )
         continue
-      
+
       let next = this.world.getNode( link.to )
 
       let isBackward = this.isBackward( next, context )
@@ -218,7 +261,7 @@ class ActionHandler
         handle: "Pick your nose",
         act: new Act("picknose"),
       } )
-    
+
     return options.sort( (a,b) => b.weight - a.weight )
   }
 
@@ -258,7 +301,7 @@ class Act
 {
   constructor( public type:"goto"|"spawn"|"lookaround"|"lookdown"|"picknose",
                public params:any = {},
-               public flags:string[] = [] 
+               public flags:string[] = []
              ) {}
 }
 
