@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/project",
+    "public": "dist/txtrpg-game",
     "ignore": [
       "firebase.json",
       "**/.*",
